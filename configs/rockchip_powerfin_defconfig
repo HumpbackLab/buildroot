@@ -1,0 +1,2 @@
+#include "rockchip_rk3506_luckfox_defconfig"
+BR2_PACKAGE_PX4_POWERFIN=y

@@ -1,0 +1,8 @@
+config BR2_PACKAGE_PX4_POWERFIN
+	bool "PX4 for PowerFin"
+	depends on BR2_arm
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Build the PX4 humpback_powerfin target and install its Linux
+	  runtime under /root/px4.
