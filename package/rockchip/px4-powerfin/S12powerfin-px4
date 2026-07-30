@@ -1,0 +1,76 @@
+#!/bin/sh
+
+PX4_DIR=/root/px4
+PX4_BIN="$PX4_DIR/bin/px4"
+PX4_CONFIG=posix-configs/powerfin/px4_mc.config
+PID_FILE=/run/powerfin-px4.pid
+LOG_FILE=/var/log/powerfin-px4.log
+
+is_running()
+{
+	[ -s "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+}
+
+start_px4()
+{
+	if is_running; then
+		return 0
+	fi
+
+	if [ ! -x "$PX4_BIN" ] || [ ! -r "$PX4_DIR/$PX4_CONFIG" ]; then
+		echo "PX4 runtime is incomplete under $PX4_DIR" >&2
+		return 1
+	fi
+
+	if ! modprobe sc7u22 >>"$LOG_FILE" 2>&1; then
+		echo "Failed to load sc7u22 kernel module" >&2
+		return 1
+	fi
+
+	rm -f "$PID_FILE"
+	(
+		cd "$PX4_DIR" || exit 1
+		exec "$PX4_BIN" -d -s "$PX4_CONFIG"
+	) >>"$LOG_FILE" 2>&1 &
+	echo "$!" >"$PID_FILE"
+}
+
+stop_px4()
+{
+	if ! is_running; then
+		rm -f "$PID_FILE"
+		return 0
+	fi
+
+	pid="$(cat "$PID_FILE")"
+	kill "$pid" 2>/dev/null || true
+
+	tries=0
+	while kill -0 "$pid" 2>/dev/null; do
+		tries=$((tries + 1))
+		if [ "$tries" -ge 20 ]; then
+			kill -KILL "$pid" 2>/dev/null || true
+			break
+		fi
+		sleep 0.1
+	done
+
+	rm -f "$PID_FILE"
+}
+
+case "$1" in
+	start)
+		start_px4
+		;;
+	stop)
+		stop_px4
+		;;
+	restart)
+		stop_px4
+		start_px4
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}" >&2
+		exit 1
+		;;
+esac

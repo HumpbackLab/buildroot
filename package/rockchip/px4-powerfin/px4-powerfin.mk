@@ -69,4 +69,9 @@ define PX4_POWERFIN_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/root/px4/bin/px4
 endef
 
+define PX4_POWERFIN_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 0755 $(PX4_POWERFIN_PKGDIR)/S12powerfin-px4 \
+		$(TARGET_DIR)/etc/init.d/S12powerfin-px4
+endef
+
 $(eval $(generic-package))
