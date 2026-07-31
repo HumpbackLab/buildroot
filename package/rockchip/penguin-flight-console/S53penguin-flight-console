@@ -1,0 +1,64 @@
+#!/bin/sh
+
+DAEMON=/usr/bin/penguin-flight-console
+PID_FILE=/run/penguin-flight-console.pid
+LOG_FILE=/var/log/penguin-flight-console.log
+
+is_running()
+{
+	[ -s "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+}
+
+start_console()
+{
+	if is_running; then
+		return 0
+	fi
+	if [ ! -x "$DAEMON" ]; then
+		echo "$DAEMON is missing" >&2
+		return 1
+	fi
+
+	rm -f "$PID_FILE"
+	RUST_LOG=info PFC_LISTEN=0.0.0.0:8080 \
+		"$DAEMON" >>"$LOG_FILE" 2>&1 &
+	echo $! >"$PID_FILE"
+}
+
+stop_console()
+{
+	if ! is_running; then
+		rm -f "$PID_FILE"
+		return 0
+	fi
+
+	pid=$(cat "$PID_FILE")
+	kill "$pid" 2>/dev/null || true
+	tries=0
+	while kill -0 "$pid" 2>/dev/null; do
+		tries=$((tries + 1))
+		if [ "$tries" -ge 20 ]; then
+			kill -KILL "$pid" 2>/dev/null || true
+			break
+		fi
+		sleep 0.1
+	done
+	rm -f "$PID_FILE"
+}
+
+case "$1" in
+start)
+	start_console
+	;;
+stop)
+	stop_console
+	;;
+restart)
+	stop_console
+	start_console
+	;;
+*)
+	echo "Usage: $0 {start|stop|restart}" >&2
+	exit 1
+	;;
+esac
