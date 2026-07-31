@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PX4_DIR=/root/px4
+PX4_DIR=${PX4_DIR:-/root/px4}
 PX4_BIN="$PX4_DIR/bin/px4"
 PX4_CONFIG=posix-configs/powerfin/px4_mc.config
 PID_FILE=/run/powerfin-px4.pid

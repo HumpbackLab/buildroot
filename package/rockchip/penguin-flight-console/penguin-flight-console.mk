@@ -26,6 +26,8 @@ define PENGUIN_FLIGHT_CONSOLE_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/libexec/penguin-flight-console/powerfin
 	$(INSTALL) -m 0755 $(@D)/boards/powerfin/*.sh \
 		$(TARGET_DIR)/usr/libexec/penguin-flight-console/powerfin/
+	$(INSTALL) -m 0644 $(@D)/boards/powerfin/board.conf \
+		$(TARGET_DIR)/usr/libexec/penguin-flight-console/powerfin/board.conf
 endef
 
 define PENGUIN_FLIGHT_CONSOLE_INSTALL_INIT_SYSV
