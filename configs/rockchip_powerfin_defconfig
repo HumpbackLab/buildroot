@@ -1,4 +1,9 @@
 #include "rockchip_rk3506_luckfox_defconfig"
+# BR2_PACKAGE_FFMPEG is not set
+# BR2_PACKAGE_FREETYPE is not set
+# BR2_PACKAGE_RKADK is not set
+# BR2_PACKAGE_ROCKCHIP_RGA is not set
+# BR2_PACKAGE_ROCKCHIP_TEST is not set
 BR2_PACKAGE_PX4_POWERFIN=y
 BR2_TARGET_GENERIC_ISSUE="Welcome to PowerFin [root:powerfin]"
 BR2_TARGET_GENERIC_ROOT_PASSWD="powerfin"
