@@ -7,8 +7,7 @@
 BR2_PACKAGE_PX4_POWERFIN=y
 BR2_TARGET_GENERIC_ISSUE="Welcome to PowerFin [root:powerfin]"
 BR2_TARGET_GENERIC_ROOT_PASSWD="powerfin"
-BR2_ROOTFS_POST_IMAGE_SCRIPT="support/scripts/genimage.sh"
-BR2_ROOTFS_POST_SCRIPT_ARGS="-c board/rockchip/powerfin/genimage.cfg"
+BR2_ROOTFS_POST_IMAGE_SCRIPT="board/rockchip/powerfin/post-image.sh"
 BR2_PACKAGE_HOST_DOSFSTOOLS=y
 BR2_PACKAGE_HOST_GENIMAGE=y
 BR2_PACKAGE_HOST_MTOOLS=y
