@@ -11,6 +11,23 @@ is_running()
 	[ -s "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
 }
 
+start_time_bootstrap()
+{
+	time_bootstrap="$PX4_DIR/posix-configs/powerfin/time_bootstrap.sh"
+
+	if [ ! -x "$time_bootstrap" ]; then
+		echo "PowerFin time bootstrap is not executable: $time_bootstrap" >&2
+		return 0
+	fi
+
+	(
+		export PX4_DIR
+		PX4_LOG_DIR="$PX4_DIR/log"
+		export PX4_LOG_DIR
+		"$time_bootstrap"
+	) >>"$LOG_FILE" 2>&1 &
+}
+
 start_px4()
 {
 	if is_running; then
@@ -21,6 +38,9 @@ start_px4()
 		echo "PX4 runtime is incomplete under $PX4_DIR" >&2
 		return 1
 	fi
+
+	# Restore the software clock in parallel so PX4 startup is not delayed.
+	start_time_bootstrap
 
 	if ! modprobe sc7u22 >>"$LOG_FILE" 2>&1; then
 		echo "Failed to load sc7u22 kernel module" >&2
