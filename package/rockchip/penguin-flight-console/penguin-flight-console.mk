@@ -17,6 +17,8 @@ PENGUIN_FLIGHT_CONSOLE_DEPENDENCIES = wpa_supplicant
 define PENGUIN_FLIGHT_CONSOLE_BUILD_CMDS
 	test -x $(@D)/dist/penguin-flight-console || \
 		(echo "Run tools/penguin-flight-console/build-cross.sh first" >&2; false)
+	test -x $(@D)/boards/powerfin/pfc-update.sh || \
+		(echo "Missing PowerFin PFC update installer" >&2; false)
 endef
 
 define PENGUIN_FLIGHT_CONSOLE_INSTALL_TARGET_CMDS
