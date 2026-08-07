@@ -1,8 +1,0 @@
-#!/bin/sh
-
-case "${0##*/}" in
-*g++) compiler="@TARGET_CXX@" ;;
-*) compiler="@TARGET_CC@" ;;
-esac
-
-exec "$compiler" "$@"

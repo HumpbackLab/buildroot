@@ -1,0 +1,2 @@
+# px4-powerfin-latest.zip changes when a new GitHub Release is published.
+# fetch-latest-release.py verifies GitHub's per-asset digest when it is available.
