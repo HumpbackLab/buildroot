@@ -4,19 +4,14 @@
 #
 ################################################################################
 
-PENGUIN_FLIGHT_CONSOLE_VERSION = local
-PENGUIN_FLIGHT_CONSOLE_SITE = $(TOPDIR)/../tools/penguin-flight-console
-PENGUIN_FLIGHT_CONSOLE_SITE_METHOD = local
-PENGUIN_FLIGHT_CONSOLE_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = \
-	--exclude=/target \
-	--exclude=/dev-config \
-	--exclude=/dev-run
+PENGUIN_FLIGHT_CONSOLE_VERSION = refs/remotes/origin/master
+PENGUIN_FLIGHT_CONSOLE_SITE = ssh://git@github.com/HumpbackLab/penguin-flight-console.git
+PENGUIN_FLIGHT_CONSOLE_SITE_METHOD = git
 PENGUIN_FLIGHT_CONSOLE_LICENSE = MIT OR Apache-2.0
 PENGUIN_FLIGHT_CONSOLE_DEPENDENCIES = wpa_supplicant
 
 define PENGUIN_FLIGHT_CONSOLE_BUILD_CMDS
-	test -x $(@D)/dist/penguin-flight-console || \
-		(echo "Run tools/penguin-flight-console/build-cross.sh first" >&2; false)
+	cd $(@D) && ./build-cross.sh
 	test -x $(@D)/boards/powerfin/pfc-update.sh || \
 		(echo "Missing PowerFin PFC update installer" >&2; false)
 endef

@@ -3,6 +3,5 @@ config BR2_PACKAGE_PENGUIN_FLIGHT_CONSOLE
 	select BR2_PACKAGE_WPA_SUPPLICANT
 	select BR2_PACKAGE_WPA_SUPPLICANT_NL80211
 	help
-	  Humpbacklab's USB RNDIS web manager for PowerFin Linux flight
-	  controllers. Run tools/penguin-flight-console/build-cross.sh before
-	  building the root filesystem.
+	  Build Humpbacklab's USB RNDIS web manager from its GitHub
+	  repository and install the PowerFin board integration files.

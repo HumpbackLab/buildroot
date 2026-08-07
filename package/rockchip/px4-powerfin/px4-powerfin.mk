@@ -4,13 +4,10 @@
 #
 ################################################################################
 
-PX4_POWERFIN_VERSION = local
-PX4_POWERFIN_SITE = $(TOPDIR)/../../PX4-Autopilot
-PX4_POWERFIN_SITE_METHOD = local
-PX4_POWERFIN_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = \
-	--exclude=/build \
-	--exclude=/.codegraph \
-	--exclude=/fly.tar
+PX4_POWERFIN_VERSION = refs/remotes/origin/zero_3w
+PX4_POWERFIN_SITE = https://github.com/AutopilotPi/PX4-Autopilot.git
+PX4_POWERFIN_SITE_METHOD = git
+PX4_POWERFIN_GIT_SUBMODULES = YES
 PX4_POWERFIN_LICENSE = BSD-3-Clause
 PX4_POWERFIN_LICENSE_FILES = LICENSE
 PX4_POWERFIN_DEPENDENCIES = host-cmake host-ninja host-patchelf

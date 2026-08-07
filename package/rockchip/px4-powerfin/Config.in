@@ -4,5 +4,5 @@ config BR2_PACKAGE_PX4_POWERFIN
 	depends on BR2_TOOLCHAIN_USES_GLIBC
 	depends on BR2_INSTALL_LIBSTDCPP
 	help
-	  Build the PX4 humpback_powerfin target and install its Linux
-	  runtime under /root/px4.
+	  Build the latest PX4 humpback_powerfin target from the zero_3w
+	  branch and install its Linux runtime under /root/px4.
