@@ -4,9 +4,11 @@
 #
 ################################################################################
 
-PENGUIN_FLIGHT_CONSOLE_VERSION = 0.1.0
-PENGUIN_FLIGHT_CONSOLE_SOURCE = penguin-flight-console-update.tar.gz
-PENGUIN_FLIGHT_CONSOLE_SITE = https://gitee.com/ncer/penguin-flight-console/releases/download/v$(PENGUIN_FLIGHT_CONSOLE_VERSION)
+include package/rockchip/penguin-flight-console/pfc-release.conf
+
+PENGUIN_FLIGHT_CONSOLE_VERSION = $(PFC_RELEASE_VERSION)
+PENGUIN_FLIGHT_CONSOLE_SOURCE = $(PFC_RELEASE_SOURCE)
+PENGUIN_FLIGHT_CONSOLE_SITE = $(PFC_RELEASE_SITE)
 PENGUIN_FLIGHT_CONSOLE_STRIP_COMPONENTS = 0
 PENGUIN_FLIGHT_CONSOLE_LICENSE = Proprietary
 PENGUIN_FLIGHT_CONSOLE_DEPENDENCIES = wpa_supplicant
