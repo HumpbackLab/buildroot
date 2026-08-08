@@ -3,5 +3,5 @@ config BR2_PACKAGE_PENGUIN_FLIGHT_CONSOLE
 	select BR2_PACKAGE_WPA_SUPPLICANT
 	select BR2_PACKAGE_WPA_SUPPLICANT_NL80211
 	help
-	  Build Humpbacklab's USB RNDIS web manager from its GitHub
-	  repository and install the PowerFin board integration files.
+	  Install HumpbackLab's prebuilt USB RNDIS web manager and the
+	  PowerFin board integration files.
