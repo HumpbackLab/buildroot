@@ -55,11 +55,27 @@ def find_asset(repository):
     )
 
 
+def cache_metadata(repository, release, asset):
+    return {
+        "repository": repository,
+        "release": release.get("tag_name"),
+        "asset": asset.get("name"),
+        "digest": asset.get("digest"),
+    }
+
+
+def cached_asset_matches(output, metadata_path, expected):
+    if not output.is_file() or not metadata_path.is_file():
+        return False
+    try:
+        with metadata_path.open(encoding="utf-8") as metadata_file:
+            return json.load(metadata_file) == expected
+    except (OSError, json.JSONDecodeError):
+        return False
+
+
 def download_asset(asset, output):
     output.parent.mkdir(parents=True, exist_ok=True)
-    if output.is_file():
-        print(f"Using cached PX4 release archive: {output}")
-        return
 
     for attempt in range(1, 4):
         digest = hashlib.sha256()
@@ -110,14 +126,19 @@ def main():
     args = parser.parse_args()
 
     try:
-        if args.output.is_file():
+        release, asset = find_asset(args.repository)
+        metadata_path = Path(f"{args.output}.release.json")
+        expected_metadata = cache_metadata(args.repository, release, asset)
+        if cached_asset_matches(args.output, metadata_path, expected_metadata):
             print(f"Using cached PX4 release archive: {args.output}")
             return 0
-        release, asset = find_asset(args.repository)
         print(
             f"Selected PX4 release {release.get('tag_name')} asset {asset['name']}"
         )
         download_asset(asset, args.output)
+        with metadata_path.open("w", encoding="utf-8") as metadata_file:
+            json.dump(expected_metadata, metadata_file, sort_keys=True)
+            metadata_file.write("\n")
     except (RuntimeError, urllib.error.URLError, json.JSONDecodeError) as error:
         print(f"PX4 release download failed: {error}", file=sys.stderr)
         return 1
