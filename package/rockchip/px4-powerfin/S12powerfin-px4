@@ -13,7 +13,7 @@ is_running()
 
 start_time_bootstrap()
 {
-	time_bootstrap="$PX4_DIR/posix-configs/powerfin/time_bootstrap.sh"
+	time_bootstrap=/usr/sbin/powerfin-time-bootstrap
 
 	if [ ! -x "$time_bootstrap" ]; then
 		echo "PowerFin time bootstrap is not executable: $time_bootstrap" >&2
