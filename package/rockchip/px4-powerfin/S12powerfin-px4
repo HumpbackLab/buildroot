@@ -77,7 +77,7 @@ start_px4()
 	fi
 
 	tries=0
-	while [ ! -s "$PX4_READY" ]; do
+	while [ ! -e "$PX4_READY" ]; do
 		if ! is_running; then
 			echo "PX4 exited before startup completed" >&2
 			return 1
