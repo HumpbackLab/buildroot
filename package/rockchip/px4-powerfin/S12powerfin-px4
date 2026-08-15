@@ -5,6 +5,8 @@ PX4_BIN="$PX4_DIR/bin/px4"
 PX4_CONFIG=posix-configs/powerfin/px4_mc.config
 PID_FILE=/run/powerfin-px4.pid
 LOG_FILE=/var/log/powerfin-px4.log
+SC7U22_STATUS=/run/powerfin-sc7u22.status
+PX4_READY=/run/powerfin-px4-ready
 
 is_running()
 {
@@ -14,6 +16,9 @@ is_running()
 start_time_bootstrap()
 {
 	time_bootstrap=/usr/sbin/powerfin-time-bootstrap
+	if [ ! -x "$time_bootstrap" ]; then
+		time_bootstrap="$PX4_DIR/posix-configs/powerfin/time_bootstrap.sh"
+	fi
 
 	if [ ! -x "$time_bootstrap" ]; then
 		echo "PowerFin time bootstrap is not executable: $time_bootstrap" >&2
@@ -25,6 +30,18 @@ start_time_bootstrap()
 		PX4_LOG_DIR="$PX4_DIR/log"
 		export PX4_LOG_DIR
 		"$time_bootstrap"
+	) >>"$LOG_FILE" 2>&1 &
+}
+
+start_sc7u22_load()
+{
+	rm -f "$SC7U22_STATUS"
+	(
+		if modprobe sc7u22; then
+			echo ready >"$SC7U22_STATUS"
+		else
+			echo failed >"$SC7U22_STATUS"
+		fi
 	) >>"$LOG_FILE" 2>&1 &
 }
 
@@ -41,24 +58,43 @@ start_px4()
 
 	# Restore the software clock in parallel so PX4 startup is not delayed.
 	start_time_bootstrap
+	# SC7U22 has a fixed hardware reset delay. Overlap it with PX4 parameter and
+	# airframe initialization; px4_mc.config waits before starting the driver.
+	start_sc7u22_load
 
-	if ! modprobe sc7u22 >>"$LOG_FILE" 2>&1; then
-		echo "Failed to load sc7u22 kernel module" >&2
-		return 1
-	fi
-
-	rm -f "$PID_FILE"
+	rm -f "$PID_FILE" "$PX4_READY"
 	(
 		cd "$PX4_DIR" || exit 1
 		exec "$PX4_BIN" -d -s "$PX4_CONFIG"
 	) >>"$LOG_FILE" 2>&1 &
 	echo "$!" >"$PID_FILE"
+
+	# Older PX4 release archives do not create the ready marker. Keep them
+	# bootable during the transition; new PowerFin configs block later services
+	# until mavlink boot_complete has run.
+	if ! grep -q '/run/powerfin-px4-ready' "$PX4_DIR/$PX4_CONFIG"; then
+		return 0
+	fi
+
+	tries=0
+	while [ ! -s "$PX4_READY" ]; do
+		if ! is_running; then
+			echo "PX4 exited before startup completed" >&2
+			return 1
+		fi
+		tries=$((tries + 1))
+		if [ "$tries" -ge 1000 ]; then
+			echo "Timed out waiting for PX4 startup" >&2
+			return 1
+		fi
+		sleep 0.01
+	done
 }
 
 stop_px4()
 {
 	if ! is_running; then
-		rm -f "$PID_FILE"
+		rm -f "$PID_FILE" "$PX4_READY"
 		return 0
 	fi
 
@@ -75,7 +111,7 @@ stop_px4()
 		sleep 0.1
 	done
 
-	rm -f "$PID_FILE"
+	rm -f "$PID_FILE" "$PX4_READY"
 }
 
 case "$1" in
